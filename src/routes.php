@@ -15,7 +15,7 @@ $app->get('/todos', function ($request, $response, $args) {
 //routes:
 //welcome
 $app->get('/welcome', function ($request, $response, $args) {
-    return $response->withStatus(200)->write('Welcome to Peruna Projects!');
+    return $response->withStatus(200)->write('Welcome to Peruna Projects! This is a test');
 });
 //student
 $app->get('/student/{name}', function($request, $response, $args) {
