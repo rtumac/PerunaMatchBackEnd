@@ -10,6 +10,21 @@ $app->get('/todos', function ($request, $response, $args) {
         return $this->response->withJson($todos);
 });
 
+$app->get('/listing/{projectId}', function($request, $response, $args) {
+	$sql = $this->db->prepare("SELECT * FROM Listings WHERE projectId = " . $args['projectId']);
+
+	try{
+		$sql->execute();
+	}
+	catch(Exception $e) {
+		return $response->withJson(["error" => "error.unauthorized"], 400)
+				->withHeader('Content-Type', 'application/Json');
+	}
+
+	$listings = $sql->fetchAll();
+
+	return $this->response->withJson($listings);
+});
 
 $app->put('/signup', function($request, $response, $args) {
 	$parsedBody = $request->getParsedBody();
@@ -45,7 +60,7 @@ $app->put('/signup', function($request, $response, $args) {
 
 //welcome
 $app->get('/welcome', function ($request, $response, $args) {
-    return $response->withStatus(200)->write('Welcome to Peruna Projects!');
+    return $response->withStatus(200)->write('Hello!');
 });
 
 //student
@@ -56,11 +71,6 @@ $app->get('/student/{name}', function($request, $response, $args) {
 //professor
 $app->get('/professor/{name}', function($request, $response, $args) {
         return $response->write("Professor Profile for: " . $args['name']);
-});
-
-//listings
-$app->get('/listings', function ($request, $response, $args) {
-    return $response->withStatus(200)->write("My Listings");
 });
 
 //settings
