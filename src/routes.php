@@ -66,7 +66,6 @@ $app->post('/login', function($request, $response, $args) {
 	}
 	
 
-	//return $response->withStatus(201)->write('success');
 });
 
 
