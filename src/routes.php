@@ -11,9 +11,18 @@ $app->get('/todos', function ($request, $response, $args) {
 });
 
 $app->get('/listing/{projectId}', function($request, $response, $args) {
-	$sth = $this->db->prepare("SELECT * FROM Listings WHERE projectId = " . $args['projectId']);
-	$sth->execute();
-	$listings = $sth->fetchAll();
+	$sql = $this->db->prepare("SELECT * FROM Listings WHERE projectId = " . $args['projectId']);
+
+	try{
+		$sql->execute();
+	}
+	catch(Exception $e) {
+		return $response->withJson(["error" => "error"], 401)
+				->withHeader('Content-Type', 'application/Json');
+	}
+
+	$listings = $sql->fetchAll();
+
 	return $this->response->withJson($listings);
 });
 
