@@ -10,6 +10,12 @@ $app->get('/todos', function ($request, $response, $args) {
         return $this->response->withJson($todos);
 });
 
+$app->get('/listings', function($request, $response, $args) {
+	$sth = $this->db->prepare("SELECT * FROM Listings");
+	$sth->execute();
+	$listings = $sth->fetchAll();
+	return $this->response->withJson($listings);
+});
 
 $app->put('/signup', function($request, $response, $args) {
 	$parsedBody = $request->getParsedBody();
@@ -56,11 +62,6 @@ $app->get('/student/{name}', function($request, $response, $args) {
 //professor
 $app->get('/professor/{name}', function($request, $response, $args) {
         return $response->write("Professor Profile for: " . $args['name']);
-});
-
-//listings
-$app->get('/listings', function ($request, $response, $args) {
-    return $response->withStatus(200)->write("My Listings");
 });
 
 //settings
