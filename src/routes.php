@@ -23,7 +23,6 @@ $app->put('/signup', function($request, $response, $args) {
 		$isProfessor = 'true';
 	}
 
-
 	$sql = $this->db->prepare(
 		"INSERT INTO Users (userID, username, password, email, isProfessor)
 		 VALUES ('{$userID}', '{$username}', '{$password}', '{$email}', '{$isProfessor}')"
@@ -38,7 +37,6 @@ $app->put('/signup', function($request, $response, $args) {
 	}
 
 	$responseBody = ["token" => 12343, "userID" => $userID, "isProfessor" => $parsedBody['isProfessor']];
-
 	return $response->withJson($responseBody, 201)
 			->withHeader('Content-Type', 'application/json')
 			->withHeader('Location', '/signup');
