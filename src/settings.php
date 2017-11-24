@@ -16,11 +16,11 @@ return [
             'level' => \Monolog\Logger::DEBUG,
         ],
 
-	//ADD THIS SECTION
+        //ADD THIS SECTION
 	"db" => [
-	"host" => "mydatabaseinstance.c99sbhuyo3vq.us-east-2.rds.amazonaws.com",
-	"dbname" => "TestName",
-	"user" => "jeremybrachle",
+	"host" => "18.216.200.109",
+	"dbname" => "PerunaMatchDB",
+	"user" => "www",
 	"pass" => "Computer!716"
 	],
 

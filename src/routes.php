@@ -5,12 +5,11 @@ use Slim\Http\Response;
 
 
 $app->get('/todos', function ($request, $response, $args) {
-         $sth = $this->db->prepare("SELECT * FROM tasks ORDER BY task");
+         $sth = $this->db->prepare("SELECT * FROM Users");
         $sth->execute();
         $todos = $sth->fetchAll();
         return $this->response->withJson($todos);
     });
-
 //routes:
 
 //welcome
@@ -57,7 +56,6 @@ $app->post('/login', function($request, $response, $args) {
 		$success = array("token" => 1234, "userId" => 01, "isProfessor" => true);
 		return $response->withJson($success, 201);
 
-		//return $response->withStatus(201)->write('success');
 	}
 	else
 	{
@@ -66,14 +64,4 @@ $app->post('/login', function($request, $response, $args) {
 	}
 	
 
-});
-
-
-// Run application
-$app->get('/[{name}]', function (Request $request, Response $response, array $args) {
-    // Sample log message
-    $this->logger->info("Slim-Skeleton '/' route");
-
-    // Render index view
-    return $this->renderer->render($response, 'index.phtml', $args);
 });
