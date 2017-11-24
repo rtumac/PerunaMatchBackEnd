@@ -26,7 +26,7 @@ $app->put('/signup', function($request, $response, $args) {
 
 	$sql = $this->db->prepare(
 		"INSERT INTO Users (userID, username, password, email, isProfessor)
-		 VALUES ('{$userID}', '{$username}', '{$password}', '{$mail}', '{$isProfessor}')"
+		 VALUES ('{$userID}', '{$username}', '{$password}', '{$email}', '{$isProfessor}')"
 	);
 
 	try {
