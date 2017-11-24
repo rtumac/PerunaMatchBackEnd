@@ -13,36 +13,19 @@ $app->get('/todos', function ($request, $response, $args) {
 
 $app->put('/signup', function($request, $response, $args) {
 	$parsedBody = $request->getParsedBody();
-	$userID = $parsedBody['userID'];
-        $username = $parsedBody['username'];
-        $password = $parsedBody['password'];
-        $email = $parsedBody['email'];
-	$isProfessor = 'false';
-
-	if( $parsedBody['isProfessor'] ) {
-		$isProfessor = 'true';
-	}
-
-
-	$sql = $this->db->prepare(
-		"INSERT INTO Users (userID, username, password, email, isProfessor)
-		 VALUES ('{$userID}', '{$username}', '{$password}', '{$mail}', '{$isProfessor}')"
-	);
-
-	try {
-		$sql->execute();
-	}
-	catch(Exception $e) {
-		return $response->withJson(["error" => "error"], 401)
-				->withHeader('Content-Type', 'application/json');
-	}
-
-	$responseBody = ["token" => 12343, "userID" => $userID, "isProfessor" => $parsedBody['isProfessor']];
-
-	return $response->withJson($responseBody, 201)
-			->withHeader('Content-Type', 'application/json')
-			->withHeader('Location', '/signup');
+	$sql = $this->db->prepare("INSERT INTO Users (userID, username, password, email, isProfe VALUES );
+	/*
+	$userID = $parsedBody[0];
+	$username = $parsedBody['username'];
+	$password = $parsedBody['password'];
+	$email = $parsedBody['email'];
+	$isProfessor = $parsedBody['isProfessor'];
+*/
+	var_dump($parsedBody);
 });
+
+
+
 
 
 //welcome
