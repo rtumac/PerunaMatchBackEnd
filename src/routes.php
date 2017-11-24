@@ -19,7 +19,7 @@ $app->get('/todos', function ($request, $response, $args) {
 
 //welcome
 $app->get('/welcome', function ($request, $response, $args) {
-    return $response->withStatus(200)->write('Welcome to Peruna Projects!');
+    return $response->withStatus(200)->write('Hello!');
 });
 
 //student
