@@ -17,7 +17,7 @@ $app->get('/listing/{projectId}', function($request, $response, $args) {
 		$sql->execute();
 	}
 	catch(Exception $e) {
-		return $response->withJson(["error" => "error"], 401)
+		return $response->withJson(["error" => "error.unauthorized"], 400)
 				->withHeader('Content-Type', 'application/Json');
 	}
 
