@@ -35,6 +35,38 @@ $app->get('/{name}/settings', function($request, $response, $args) {
 });
 
 
+//log in
+$app->post('/login', function($request, $response, $args) {
+	//get the body
+	$data = $request->getParsedBody();
+	//make variables for username and password
+	$userID = filter_var($data['username'], FILTER_SANITIZE_STRING);
+	$passCode = filter_var($data['password'], FILTER_SANITIZE_STRING);
+
+	
+	//check mysql for the username and password
+
+
+	
+	//check to see if the username and password are correct
+	if($userID == "nhidang" and $passCode == "welcome")
+	{
+		$success = array("token" => 1234, "userId" => 01, "isProfessor" => true);
+		return $response->withJson($success, 201);
+
+		//return $response->withStatus(201)->write('success');
+	}
+	else
+	{
+		$error = array("error" => "error.unauthorized");
+		return $response->withJson($error, 401);
+	}
+	
+
+	//return $response->withStatus(201)->write('success');
+});
+
+
 $app->get('/[{name}]', function (Request $request, Response $response, array $args) {
     // Sample log message
     $this->logger->info("Slim-Skeleton '/' route");
