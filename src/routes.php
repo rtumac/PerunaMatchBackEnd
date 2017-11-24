@@ -10,8 +10,8 @@ $app->get('/todos', function ($request, $response, $args) {
         return $this->response->withJson($todos);
 });
 
-$app->get('/listings', function($request, $response, $args) {
-	$sth = $this->db->prepare("SELECT * FROM Listings");
+$app->get('/listing/{projectId}', function($request, $response, $args) {
+	$sth = $this->db->prepare("SELECT * FROM Listings WHERE projectId = " . $args['projectId']);
 	$sth->execute();
 	$listings = $sth->fetchAll();
 	return $this->response->withJson($listings);
