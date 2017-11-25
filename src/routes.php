@@ -3,13 +3,15 @@
 use Slim\Http\Request;
 use Slim\Http\Response;
 
-//routes:
+//projects
 $app->get('/projects', function ($request, $response, $args) {
 	try {
+		//querry DB for project info
 		$sth = $this->db->prepare("SELECT projectID, name, tag, posterID FROM Projects");
    		$sth->execute();
    		$result = $sth->fetchAll();
 
+		//cast querry results as the appropriate data types
 		foreach($result as &$curr) {
 			$curr['projectID'] = (int) $curr['projectID'];
 			$curr['tag'] = json_decode($curr['tag']);
@@ -42,18 +44,17 @@ $app->get('/listing/{projectId}', function($request, $response, $args) {
 	return $this->response->withJson($listings);
 });
 
+//signup
 $app->put('/signup', function($request, $response, $args) {
+	//retrive data from request body
 	$parsedBody = $request->getParsedBody();
 	$userID = $parsedBody['userID'];
         $username = $parsedBody['username'];
         $password = $parsedBody['password'];
         $email = $parsedBody['email'];
-	$isProfessor = 'false';
+	$isProfessor = ($parsedBody['isProfessor']) ? 'true' : 'false';
 
-	if( $parsedBody['isProfessor'] ) {
-		$isProfessor = 'true';
-	}
-
+	//prepare SQL statement for inserting a new user into DB
 	$sql = $this->db->prepare(
 		"INSERT INTO Users (userID, username, password, email, isProfessor)
 		 VALUES ('{$userID}', '{$username}', '{$password}', '{$email}', '{$isProfessor}')"
