@@ -44,24 +44,39 @@ $app->post('/login', function($request, $response, $args) {
 	//make variables for username and password
 	$userID = filter_var($data['username'], FILTER_SANITIZE_STRING);
 	$passCode = filter_var($data['password'], FILTER_SANITIZE_STRING);
-
 	
 	//check mysql for the username and password
+	$query = $this->db->prepare("SELECT * FROM Users WHERE username = '".$userID."' AND password = '".$passCode."'");
+	$query->execute();
 
+	//get the count of the numebr of rows affected by the query
+	$count = $query->rowCount();
 
-	
-	//check to see if the username and password are correct
-	if($userID == "nhidang" and $passCode == "welcome")
+	//now check if the number of rows is 1 (match) or 0 (no match)
+	if($count == 1)
 	{
-		$success = array("token" => 1234, "userId" => 01, "isProfessor" => true);
+		//get the values from the array:
+		$uToken = 1234; //default for now
+
+		//get the user's id:
+		$queryID = $this->db->prepare("SELECT * FROM Users WHERE username = '".$userID."' AND password = '".$passCode."'");
+		$queryID->execute();
+		$uId = $queryID->fetchColumn(); //get the first column for the user id
+
+		//get the boolean for whether the user is a professor
+		$queryIsProf = $this->db->prepare("SELECT * FROM Users WHERE username = '".$userID."' AND password = '".$passCode."'");
+		$queryIsProf->execute();
+                $isProf = $queryIsProf->fetchColumn(4); //get the professor boolean
+
+		//make an array for outputting to json
+		$success = array("token" => $uToken, "userId" => $uId, "isProfessor" => $isProf);
 		return $response->withJson($success, 201);
 
 	}
-	else
+	else //no match
 	{
 		$error = array("error" => "error.unauthorized");
 		return $response->withJson($error, 401);
 	}
-	
 
 });
