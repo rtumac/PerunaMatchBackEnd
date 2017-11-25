@@ -16,7 +16,6 @@ return [
             'level' => \Monolog\Logger::DEBUG,
         ],
 
-
         //ADD THIS SECTION
 	"db" => [
 	"host" => "18.216.200.109",
