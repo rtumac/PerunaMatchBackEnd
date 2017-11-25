@@ -3,11 +3,26 @@
 use Slim\Http\Request;
 use Slim\Http\Response;
 
-$app->get('/todos', function ($request, $response, $args) {
-        $sth = $this->db->prepare("SELECT * FROM Users");
-        $sth->execute();
-        $todos = $sth->fetchAll();
-        return $this->response->withJson($todos);
+$app->get('/projects', function ($request, $response, $args) {
+	try {
+		$sth = $this->db->prepare("SELECT projectID, name, tag, posterID FROM Projects");
+   		$sth->execute();
+   		$result = $sth->fetchAll();
+
+		foreach($result as &$curr) {
+			$curr['projectID'] = (int) $curr['projectID'];
+			$curr['tag'] = json_decode($curr['tag']);
+			$curr['posterID'] = (int) $curr['posterID'];
+		}
+
+	        return $response->withJson(["projects" => $result], 201)
+				->withHeader('Content-Type', 'application/json')
+                        	->withHeader('Location', '/projects');
+	}
+	catch(Exception $e) {
+                return $response->withJson(["error" => "error.unauthorized"], 400)
+                                ->withHeader('Content-Type', 'application/json');
+        }
 });
 
 
