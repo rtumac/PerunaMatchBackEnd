@@ -124,8 +124,10 @@ $app->post('/login', function($request, $response, $args) {
 		$queryIsProf->execute();
                 $isProf = $queryIsProf->fetchColumn(4); //get the professor boolean
 
+		$isProfBool = $isProf === 'true'? true: false;
+
 		//make an array for outputting to json
-		$success = array("token" => $uToken, "userId" => $uId, "isProfessor" => $isProf);
+		$success = array("token" => $uToken, "userId" =>(int)$uId, "isProfessor" => $isProfBool);
 		return $response->withJson($success, 201);
 
 	}
