@@ -45,7 +45,7 @@ $app->get('/listing/{projectId}', function($request, $response, $args) {
 	$listings = $sql->fetchAll();
 
 	//Listings and header
-	return $this->response->withJson({$listings}, 201)
+	return $this->response->withJson($listings, 201)
 			      ->withHeader('Content-Type', 'application/Json')
 			      ->withHeader('Location', '/listing/:id');
 });
