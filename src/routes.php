@@ -28,9 +28,12 @@ $app->get('/projects', function ($request, $response, $args) {
         }
 });
 
+//Listings
 $app->get('/listing/{projectId}', function($request, $response, $args) {
-	$sql = $this->db->prepare("SELECT * FROM Listings WHERE projectId = " . $args['projectId']);
+	$sql = $this->db->prepare("SELECT projectID, title, description, start, end, majors, contactName, contactEmail FROM Listings WHERE projectId = " . $args['projectId']);
 
+
+	//SQL error handling (for if non-integer is passed in as Project ID)
 	try{
 		$sql->execute();
 	}
@@ -41,7 +44,10 @@ $app->get('/listing/{projectId}', function($request, $response, $args) {
 
 	$listings = $sql->fetchAll();
 
-	return $this->response->withJson($listings);
+	//Listings and header
+	return $this->response->withJson({$listings}, 201)
+			      ->withHeader('Content-Type', 'application/Json')
+			      ->withHeader('Location', '/listing/:id');
 });
 
 //signup
