@@ -50,6 +50,21 @@ $app->get('/listing/{projectId}', function($request, $response, $args) {
 			      ->withHeader('Location', '/listing/:id');
 });
 
+//listing/listingID - DELETE
+$app->delete('/listing/{listingID}', function($request, $response, $args) {
+	try {
+		$sql = $this->db->prepare("DELETE FROM Listings WHERE id = {$args['listingID']}");
+		$sql->execute();
+
+		return $response->withStatus(200)
+                                ->withHeader('Content-Type', 'application/json');
+	}
+	catch(Exception $e) {
+		return $response->withJson(["error" => "error"], 401)
+                                ->withHeader('Content-Type', 'application/json');
+	}
+});
+
 //signup
 $app->put('/signup', function($request, $response, $args) {
 	//retrive data from request body
