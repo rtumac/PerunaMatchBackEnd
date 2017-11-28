@@ -135,7 +135,11 @@ $app->post('/login', function($request, $response, $args) {
 
 		//make an array for outputting to json
 		$success = array("token" => $uToken, "userId" =>(int)$uId, "isProfessor" => $isProfBool);
-		return $response->withJson($success, 201);
+		//return $response->withJson($success, 201);
+
+		return $response->withJson($success, 201)
+                                ->withHeader('Content-Type', 'application/json')
+                                ->withHeader('Location', '/login');
 
 	}
 	else //no match
