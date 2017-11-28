@@ -28,7 +28,9 @@ $app->get('/projects', function ($request, $response, $args) {
         }
 });
 
-//Listings
+//--------------------------------------listing section begin--------------------------
+
+//get the listings based on project ID
 $app->get('/listing/{projectId}', function($request, $response, $args) {
 	$sql = $this->db->prepare("SELECT projectID, title, description, start, end, majors, contactName, contactEmail FROM Listings WHERE projectId = " . $args['projectId']);
 
@@ -64,6 +66,8 @@ $app->delete('/listing/{listingID}', function($request, $response, $args) {
                                 ->withHeader('Content-Type', 'application/json');
 	}
 });
+
+//--------------------------------------listing section end--------------------------
 
 //signup
 $app->put('/signup', function($request, $response, $args) {
