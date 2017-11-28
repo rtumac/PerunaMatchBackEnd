@@ -30,19 +30,24 @@ $app->get('/projects', function ($request, $response, $args) {
 
 //Listings
 $app->get('/listing/{projectId}', function($request, $response, $args) {
-	$sql = $this->db->prepare("SELECT projectID, title, description, start, end, majors, contactName, contactEmail FROM Listings WHERE projectId = " . $args['projectId']);
+	$sql = $this->db->prepare("SELECT id, projectID, title, description, start, end, majors, contactName, contactEmail FROM Listings WHERE projectId = " . $args['projectId']);
 
 
 	//SQL error handling (for if non-integer is passed in as Project ID)
 	try{
 		$sql->execute();
+		$listings = $sql->fetchAll();
+		foreach($listings as &$curr){
+			$curr['id'] = (int) $curr['id'];
+			$curr['projectID'] = (int) $curr['projectID'];
+			$curr['majors'] = json_decode($curr['majors']);
+		}
 	}
 	catch(Exception $e) {
 		return $response->withJson(["error" => "error.unauthorized"], 400)
 				->withHeader('Content-Type', 'application/Json');
 	}
 
-	$listings = $sql->fetchAll();
 
 	//Listings and header
 	return $this->response->withJson($listings, 201)
