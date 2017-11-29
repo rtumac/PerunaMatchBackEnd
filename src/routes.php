@@ -30,19 +30,24 @@ $app->get('/projects', function ($request, $response, $args) {
 //-------------------------------------------------Begin Listings Section---------------------------------
 //get listings based on project id
 $app->get('/listing/{projectId}', function($request, $response, $args) {
-	$sql = $this->db->prepare("SELECT projectID, title, description, start, end, majors, contactName, contactEmail FROM Listings WHERE projectId = " . $args['projectId']);
+	$sql = $this->db->prepare("SELECT id, projectID, title, description, start, end, majors, contactName, contactEmail FROM Listings WHERE projectId = " . $args['projectId']);
 
 
 	//SQL error handling (for if non-integer is passed in as Project ID)
 	try{
 		$sql->execute();
+		$listings = $sql->fetchAll();
+		foreach($listings as &$curr){
+			$curr['id'] = (int) $curr['id'];
+			$curr['projectID'] = (int) $curr['projectID'];
+			$curr['majors'] = json_decode($curr['majors']);
+		}
 	}
 	catch(Exception $e) {
 		return $response->withJson(["error" => "error.unauthorized"], 400)
 				->withHeader('Content-Type', 'application/Json');
 	}
 
-	$listings = $sql->fetchAll();
 
 	//Listings and header
 	return $this->response->withJson($listings, 201)
@@ -206,4 +211,80 @@ $app->post('/login', function($request, $response, $args) {
 		return $response->withJson($error, 401);
 	}
 
+});
+
+$app->group('/favorites', function () {
+    //adds a new entry in Favorites table
+    $this->post('', function ($request, $response, $args) {
+	try {
+                //retrive data from request body
+                $parsedBody = $request->getParsedBody();
+
+		//prepare SQL statement for inserting a new entry in Favorites table
+ 	      	$sql = $this->db->prepare(
+        	        "INSERT INTO Favorites (userID, listingID)
+                	 VALUES ({$parsedBody['userID']}, {$parsedBody['listingID']})"
+       		);
+                $sql->execute();
+
+                return $response->withJson(["success" => "success"], 201)
+                                ->withHeader('Content-Type', 'application/json');
+        }
+        catch(Exception $e) {
+                return $response->withJson(["error" => "error"], 401)
+                                ->withHeader('Content-Type', 'application/json');
+        }
+    });
+
+    //returns all the listings id for a given user
+    $this->post('/userid', function ($request, $response, $args) {
+	try {
+                //retrive data from request body
+                $parsedBody = $request->getParsedBody();
+
+                //prepare SQL statement for inserting a new entry in Favorites table
+                $sql = $this->db->prepare("SELECT *
+					   FROM Listings 
+				           JOIN ( SELECT listingID
+					          FROM Favorites
+					          WHERE userID = {$parsedBody['userID']}) PreQuery
+					   ON Listings.id = PreQuery.listingID");
+                $sql->execute();
+		$list = $sql->fetchAll();
+		foreach($list as &$curr){
+                        $curr['id'] = (int) $curr['id'];
+                        $curr['projectID'] = (int) $curr['projectID'];
+                        $curr['majors'] = json_decode($curr['majors']);
+                }
+
+                
+		return $response->withJson(["listings" => $list], 200)
+                                ->withHeader('Content-Type', 'application/json');
+        }
+        catch(Exception $e) {
+                return $response->withJson(["error" => "error"], 401)
+                                ->withHeader('Content-Type', 'application/json');
+        }
+    });
+
+
+    //deletes a favorite entry gieven userID and listingID
+    $this->delete('', function ($request, $response, $args) {
+	try {
+		//retrive data from request body
+	        $parsedBody = $request->getParsedBody();
+
+                $sql = $this->db->prepare("DELETE FROM Favorites WHERE userID = {$parsedBody['userID']} AND
+								       listingID = {$parsedBody['listingID']}");
+                $sql->execute();
+
+                return $response->withJson(["success" => "success"], 200)
+                                ->withHeader('Content-Type', 'application/json');
+        }
+        catch(Exception $e) {
+                return $response->withJson(["error" => "error"], 401)
+                                ->withHeader('Content-Type', 'application/json');
+        }
+
+    });
 });
