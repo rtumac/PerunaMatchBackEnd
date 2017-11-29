@@ -171,9 +171,26 @@ $app->post('/login', function($request, $response, $args) {
 });
 
 $app->group('/favorites', function () {
-    $this->put('', function ($request, $response, $args) {
-	$v = "1";
-	var_dump($v);
+    //adds a new entry in Favorites table
+    $this->post('', function ($request, $response, $args) {
+	try {
+                //retrive data from request body
+                $parsedBody = $request->getParsedBody();
+
+		//prepare SQL statement for inserting a new entry in Favorites table
+ 	      	$sql = $this->db->prepare(
+        	        "INSERT INTO Favorites (userID, listingID)
+                	 VALUES ({$parsedBody['userID']}, {$parsedBody['listingID']})"
+       		);
+                $sql->execute();
+
+                return $response->withJson(["success" => "success"], 200)
+                                ->withHeader('Content-Type', 'application/json');
+        }
+        catch(Exception $e) {
+                return $response->withJson(["error" => "error"], 401)
+                                ->withHeader('Content-Type', 'application/json');
+        }
     });
 
     //deletes a favorite entry gieven userID and listingID
@@ -196,4 +213,3 @@ $app->group('/favorites', function () {
 
     });
 });
-
