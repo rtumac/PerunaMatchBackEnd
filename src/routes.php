@@ -37,9 +37,23 @@ $app->get('/listing/{projectId}', function($request, $response, $args) {
 	try{
 		$sql->execute();
 		$listings = $sql->fetchAll();
-		foreach($listings as &$curr){
+		foreach($listings as &$curr)
+		{
 			$curr['id'] = (int) $curr['id'];
 			$curr['projectID'] = (int) $curr['projectID'];
+
+			$timeZone = new DateTimeZone("CST"); //get the time zone
+
+                	//start date
+                	$startDate = new DateTime($curr['start']); //get the start date
+                	$startDate->setTimeZone($timeZone); //set the time zone for start date
+                	$curr['start'] = date_format($startDate, 'D M j Y G:i:s \G\M\TO \(e\)'); //output start date
+
+                	//end date
+                	$endDate = new DateTime($curr['end']); //get the end date
+                	$endDate->setTimeZone($timeZone); //set the time zone for end date
+                	$curr['end'] = date_format($endDate, 'D M j Y G:i:s \G\M\TO \(e\)'); //output start date
+
 			$curr['majors'] = json_decode($curr['majors']);
 		}
 	}
@@ -79,8 +93,8 @@ $app->get('/listing/edit/{listingID}', function($request, $response, $args) {
         try
 	{
                 $query->execute();
-        }
-        catch(Exception $e) {
+	}
+	catch(Exception $e) {
                 return $response->withJson(["error" => "error.unauthorized"], 400)
                                 ->withHeader('Content-Type', 'application/Json');
         }
@@ -114,6 +128,45 @@ $app->get('/listing/edit/{listingID}', function($request, $response, $args) {
         return $this->response->withJson($listingToEdit, 201)
                               ->withHeader('Content-Type', 'application/Json')
                               ->withHeader('Location', '/listing/:id');
+
+});
+
+
+$app->put('/listing/update', function($request, $response, $args) {
+	//retrieve the data that was requested
+	$body = $request->getParsedBody();
+	$listingID = $body['id'];
+	$pID = $body['projectID'];
+	$lTitle = $body['title'];
+	$lDescrption = $body['description'];
+	$startDate = $body['start'];
+	$endDate = $body['end'];
+	$lMajors = $body['majors'];
+	$lContactName = $body['contactName'];
+	$lContactEmail = $body['contactEmail'];
+
+	//$update = $this->db->prepare("UPDATE Listings SET title = '{$lTitle}', description = '{$lDescription}', start = '{$startDate}', end = '{$endDate}', majors = '{$lMajors}', contactName = '{$lContactName}', contactEmail = '{$lContactEmail}' WHERE id = '{$listingID}'");
+
+	//$update = $this->db->prepare("UPDATE Listings SET title = '{$lTitle}', description = '{$lDescription}', start = '{$startDate}', end = '{$endDate}', contactName = '{$lContactName}', contactEmail = '{$lContactEmail}'");
+
+	//$update = $this->db->prepare("UPDATE Listings SET title = '{$lTitle}', description = '{$lDescription}' WHERE id = '{$listingID}'");
+
+	$update = $this->db->prepare("UPDATE Listings SET title = '{$lTitle}' WHERE id = '{$listingID}'");
+
+	//try executing it
+	try
+	{
+		$update->execute();
+	}
+	catch(Exception $e) 
+	{
+		return $response->withJson(["error" => "error"], 401)
+				->withHeader('Content-Type', 'application/json');
+	}
+
+	//return successful response
+	return $response->withStatus(200)
+			->withHeader('Content-Type', 'application/json');
 
 });
 
