@@ -184,7 +184,7 @@ $app->group('/favorites', function () {
        		);
                 $sql->execute();
 
-                return $response->withJson(["success" => "success"], 200)
+                return $response->withJson(["success" => "success"], 201)
                                 ->withHeader('Content-Type', 'application/json');
         }
         catch(Exception $e) {
@@ -192,6 +192,38 @@ $app->group('/favorites', function () {
                                 ->withHeader('Content-Type', 'application/json');
         }
     });
+
+    //returns all the listings id for a given user
+    $this->post('/userid', function ($request, $response, $args) {
+	try {
+                //retrive data from request body
+                $parsedBody = $request->getParsedBody();
+
+                //prepare SQL statement for inserting a new entry in Favorites table
+                $sql = $this->db->prepare("SELECT *
+					   FROM Listings 
+				           JOIN ( SELECT listingID
+					          FROM Favorites
+					          WHERE userID = {$parsedBody['userID']}) PreQuery
+					   ON Listings.id = PreQuery.listingID");
+                $sql->execute();
+		$list = $sql->fetchAll();
+		foreach($list as &$curr){
+                        $curr['id'] = (int) $curr['id'];
+                        $curr['projectID'] = (int) $curr['projectID'];
+                        $curr['majors'] = json_decode($curr['majors']);
+                }
+
+                
+		return $response->withJson(["listings" => $list], 200)
+                                ->withHeader('Content-Type', 'application/json');
+        }
+        catch(Exception $e) {
+                return $response->withJson(["error" => "error"], 401)
+                                ->withHeader('Content-Type', 'application/json');
+        }
+    });
+
 
     //deletes a favorite entry gieven userID and listingID
     $this->delete('', function ($request, $response, $args) {
