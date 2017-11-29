@@ -6,34 +6,15 @@ use Slim\Http\Response;
 //Projects
 //Add
 $app->post('/dash/addProject', function ($request, $response, $args){
-
 	$parsedBody = $request->getParsedBody();
-	$projectID = $parsedBody['projectID'];
+	$projectID = (int) $parsedBody['projectID'];
 	$name = $parsedBody['name'];
 	$tag = json_decode($parsedBody['tag']);
-	$posterID = $parsedBody['posterID'];
+	$posterID = (int) parsedBody['posterID'];
 
-	$sql = $this->db->prepare(
-		"INSERT INTO Projects (projectID, name, tag, posterID) VALUES ('($projectID)'. '(name)', '(tag)', '(psoterID)')"
-	);
+	
 
-	try{
-		$sql->execute();
-		$sql = $this->db->prepare("SELECT projectID, name, tag, posterID FROM Projects WHERE posterID = " . $posterID);
-		$project = $sql->fetchAll();
-		$project['projectID'] = (int) $project['projectID'];
-		$project['tag'] = json_decode($project['tag']);
-		$project['posterID'] = (int) $project['posterID'];
-
-		return $response->withJson(["projects" => $result], 200)
-				->withHeader('Content-Type', 'application/json');
-	}
-	catch(Exception $e){
-		return $response->withJson(["error" => "error"], 401)
-				->withHeader('Content-Type', 'application/json');
-	}
-
-});
+}
 
 //Retrieve
 $app->get('/projects', function ($request, $response, $args) {
@@ -61,6 +42,8 @@ $app->get('/projects', function ($request, $response, $args) {
 });
 
 //Listings
+
+//Retrieve
 $app->get('/listing/{projectId}', function($request, $response, $args) {
 	$sql = $this->db->prepare("SELECT id, projectID, title, description, start, end, majors, contactName, contactEmail FROM Listings WHERE projectId = " . $args['projectId']);
 

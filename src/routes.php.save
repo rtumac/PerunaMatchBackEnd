@@ -6,34 +6,32 @@ use Slim\Http\Response;
 //Projects
 //Add
 $app->post('/dash/addProject', function ($request, $response, $args){
-
 	$parsedBody = $request->getParsedBody();
-	$projectID = $parsedBody['projectID'];
+	$projectID = (int) $parsedBody['projectID'];
 	$name = $parsedBody['name'];
 	$tag = json_decode($parsedBody['tag']);
-	$posterID = $parsedBody['posterID'];
+	$posterID = (int) $parsedBody['posterID'];
 
 	$sql = $this->db->prepare(
-		"INSERT INTO Projects (projectID, name, tag, posterID) VALUES ('($projectID)'. '(name)', '(tag)', '(psoterID)')"
+		"INSERT INTO Projects (projectID, name, tag, posterID)
+		 VALUES ('($projectID)'. '(name)', '(tag)', '(psoterID)')"
 	);
 
 	try{
 		$sql->execute();
-		$sql = $this->db->prepare("SELECT projectID, name, tag, posterID FROM Projects WHERE posterID = " . $posterID);
-		$project = $sql->fetchAll();
-		$project['projectID'] = (int) $project['projectID'];
-		$project['tag'] = json_decode($project['tag']);
-		$project['posterID'] = (int) $project['posterID'];
+		$response = $sql->fetchAll();
+		$response['projectID'] = (int) $response['projectID'];
+		$response['tag'] = json_decode($response['tag']);
+		$response['posterID'] = (int) $resposne['posterID'];
 
-		return $response->withJson(["projects" => $result], 200)
-				->withHeader('Content-Type', 'application/json');
+		return $response->withJson(["projects" => re
 	}
 	catch(Exception $e){
 		return $response->withJson(["error" => "error"], 401)
 				->withHeader('Content-Type', 'application/json');
 	}
 
-});
+}
 
 //Retrieve
 $app->get('/projects', function ($request, $response, $args) {
