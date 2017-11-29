@@ -20,10 +20,9 @@ $app->post('/dash/addProject', function ($request, $response, $args){
 
 	try{
 		$sql->execute();
-		$sql = $this->db->prepare("SELECT projectID, name, tag, posterID FROM Projects WHERE posterID = " . $posterID);
-		$sql->execute();
+		$sql = $this->db->prepare("SELECT projectID, name, tag, posterID F);
 		$projects = $sql->fetchAll();
-		foreach($projects as &$curr) {
+		foreach($projects as &$curr){
 			$curr['projectID'] = (int) $curr['projectID'];
 			$curr['tag'] = json_decode($curr['tag']);
 			$curr['posterID'] = (int) $curr['posterID'];
