@@ -27,8 +27,8 @@ $app->get('/projects', function ($request, $response, $args) {
                                 ->withHeader('Content-Type', 'application/json');
         }
 });
-
-//Listings
+//-------------------------------------------------Begin Listings Section---------------------------------
+//get listings based on project id
 $app->get('/listing/{projectId}', function($request, $response, $args) {
 	$sql = $this->db->prepare("SELECT projectID, title, description, start, end, majors, contactName, contactEmail FROM Listings WHERE projectId = " . $args['projectId']);
 
@@ -64,6 +64,48 @@ $app->delete('/listing/{listingID}', function($request, $response, $args) {
                                 ->withHeader('Content-Type', 'application/json');
 	}
 });
+
+//edit a listing based on a given listing id
+$app->get('/listing/edit/{listingID}', function($request, $response, $args) {
+	//make a query for getting the listing based on the given id
+	$query = $this->db->prepare("SELECT * FROM Listings WHERE id = {$args['listingID']}");
+
+	//try/catch block to make sure a valid integer was passed as the listing ID
+        try
+	{
+                $query->execute();
+        }
+        catch(Exception $e) {
+                return $response->withJson(["error" => "error.unauthorized"], 400)
+                                ->withHeader('Content-Type', 'application/Json');
+        }
+
+        $listingToEdit = $query->fetchAll();
+
+	//loop through and cast to the correct type
+	foreach($listingToEdit as &$curr)
+	{
+		$curr['id'] = (int) $curr['id']; //cast listing ID as int
+		$curr['projectID'] = (int)$curr['projectID']; //cast project ID as int
+
+		//set the date and time:
+		$date = new DateTime($curr['start']); //get the date
+		$timeZone = new DateTimeZone("CST"); //get the time zone
+		$date->setTimeZone($timeZone); //set the time zone
+		$curr['start'] = date_format($date, 'D M j Y G:i:s \G\M\TO \(e\)'); //output as requested on apiary
+
+		$curr['majors'] = json_decode($curr['majors']); //decode the majors to get the strings
+	}
+
+        //Listings and header
+        return $this->response->withJson($listingToEdit, 201)
+                              ->withHeader('Content-Type', 'application/Json')
+                              ->withHeader('Location', '/listing/:id');
+
+});
+
+
+//-------------------------------------------------End Listings Section---------------------------------
 
 //signup
 $app->put('/signup', function($request, $response, $args) {
@@ -122,7 +164,7 @@ $app->post('/login', function($request, $response, $args) {
 	//make variables for username and password
 	$userID = filter_var($data['username'], FILTER_SANITIZE_STRING);
 	$passCode = filter_var($data['password'], FILTER_SANITIZE_STRING);
-	
+
 	//check mysql for the username and password
 	$query = $this->db->prepare("SELECT * FROM Users WHERE username = '".$userID."' AND password = '".$passCode."'");
 	$query->execute();
@@ -134,7 +176,7 @@ $app->post('/login', function($request, $response, $args) {
 	if($count == 1)
 	{
 		//get the values from the array:
-		$uToken = 1234; //default for now
+		$uToken = 1234; //default
 
 		//get the user's id:
 		$queryID = $this->db->prepare("SELECT * FROM Users WHERE username = '".$userID."' AND password = '".$passCode."'");
@@ -145,13 +187,13 @@ $app->post('/login', function($request, $response, $args) {
 		$queryIsProf = $this->db->prepare("SELECT * FROM Users WHERE username = '".$userID."' AND password = '".$passCode."'");
 		$queryIsProf->execute();
                 $isProf = $queryIsProf->fetchColumn(4); //get the professor boolean
-
+		//cast the boolean so that it is not a string
 		$isProfBool = $isProf === 'true'? true: false;
+
 
 		//make an array for outputting to json
 		$success = array("token" => $uToken, "userId" =>(int)$uId, "isProfessor" => $isProfBool);
-		//return $response->withJson($success, 201);
-
+		//return the response as specified
 		return $response->withJson($success, 201)
                                 ->withHeader('Content-Type', 'application/json')
                                 ->withHeader('Location', '/login');
@@ -159,6 +201,7 @@ $app->post('/login', function($request, $response, $args) {
 	}
 	else //no match
 	{
+		//output that there was an error
 		$error = array("error" => "error.unauthorized");
 		return $response->withJson($error, 401);
 	}
