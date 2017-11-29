@@ -93,11 +93,19 @@ $app->get('/listing/edit/{listingID}', function($request, $response, $args) {
 		$curr['id'] = (int) $curr['id']; //cast listing ID as int
 		$curr['projectID'] = (int)$curr['projectID']; //cast project ID as int
 
-		//set the date and time:
-		$date = new DateTime($curr['start']); //get the date
+
+		//set the time zone
 		$timeZone = new DateTimeZone("CST"); //get the time zone
-		$date->setTimeZone($timeZone); //set the time zone
-		$curr['start'] = date_format($date, 'D M j Y G:i:s \G\M\TO \(e\)'); //output as requested on apiary
+
+		//start date
+		$startDate = new DateTime($curr['start']); //get the start date
+		$startDate->setTimeZone($timeZone); //set the time zone for start date
+		$curr['start'] = date_format($startDate, 'D M j Y G:i:s \G\M\TO \(e\)'); //output start date
+
+		//end date
+		$endDate = new DateTime($curr['end']); //get the end date
+		$endDate->setTimeZone($timeZone); //set the time zone for end date
+		$curr['end'] = date_format($endDate, 'D M j Y G:i:s \G\M\TO \(e\)'); //output start date
 
 		$curr['majors'] = json_decode($curr['majors']); //decode the majors to get the strings
 	}
